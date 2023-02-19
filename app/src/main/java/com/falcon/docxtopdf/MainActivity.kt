@@ -1,13 +1,11 @@
 package com.falcon.docxtopdf
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -22,7 +20,9 @@ import com.falcon.docxtopdf.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
+import com.itextpdf.text.Font
 import com.itextpdf.text.Paragraph
+import com.itextpdf.text.pdf.BaseFont
 import com.itextpdf.text.pdf.PdfWriter
 import kotlinx.coroutines.*
 import org.apache.poi.xwpf.usermodel.XWPFDocument
@@ -135,8 +135,33 @@ class MainActivity : AppCompatActivity() {
         val document = Document()
         PdfWriter.getInstance(document, fileOutputStream)
         document.open()
+
+        val fontDirectory = File(this.cacheDir, "fonts")
+        if (!fontDirectory.exists()) {
+            fontDirectory.mkdirs()
+        }
+        val fontFile = File(fontDirectory, "abc.ttf")
+        if (fontFile.exists()) {
+            fontFile.delete()
+        }
+
+        val fos = FileOutputStream(fontFile)
+        val `in` = assets.open("abc.ttf")
+
+        val buffer = ByteArray(1024)
+
+        var read: Int
+        while (`in`.read(buffer).also { read = it } != -1) {
+            fos.write(buffer, 0, read)
+        }
+        `in`.close()
+        fos.flush()
+        fos.close()
+
+        val base = BaseFont.createFont(fontFile.absolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
+        val font = Font(base, 11f, Font.BOLD)
         for (paragraph in doc.paragraphs) {
-            document.add(Paragraph(paragraph.text))
+            document.add(Paragraph(paragraph.text, font))
         }
         document.close()
         Toast.makeText(this, "gfds", Toast.LENGTH_SHORT).show()
