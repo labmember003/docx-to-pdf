@@ -1,13 +1,18 @@
 package com.falcon.docxtopdf
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.provider.OpenableColumns
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -15,9 +20,8 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.falcon.docxtopdf.databinding.ActivityMainBinding
-import com.google.android.material.snackbar.Snackbar
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
 import com.itextpdf.text.Font
@@ -26,10 +30,7 @@ import com.itextpdf.text.pdf.BaseFont
 import com.itextpdf.text.pdf.PdfWriter
 import kotlinx.coroutines.*
 import org.apache.poi.xwpf.usermodel.XWPFDocument
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
+import java.io.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -43,23 +44,32 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        binding.comingSoonAnimation.visibility = View.INVISIBLE
         setSupportActionBar(binding.toolbar)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAnchorView(R.id.fab)
-                .setAction("Action", null).show()
+//        val navController = findNavController(R.id.nav_host_fragment_content_main)
+//        appBarConfiguration = AppBarConfiguration(navController.graph)
+//        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.buttonFirst.setOnClickListener {
+            binding.comingSoonAnimation.visibility = View.VISIBLE
+            selectPDF()
         }
+        binding.fab.setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAnchorView(R.id.fab).setAction("Action", null).show()
+            composeEmail("Regarding App " + getString(R.string.app_name))
+        }
+        val folder = File(this.dataDir, "convertedPDFs")
+//        ConvertedPdfRcvAdapter
+        folder.mkdirs()
+//        val file = File(folder, "test.pdf")
+//        file.createNewFile()
+        binding.rcvPDFs.adapter = folder.listFiles()
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext) }
+        binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
     }
     fun selectPDF() {
         val intent = Intent()
         intent.action = Intent.ACTION_GET_CONTENT
-//        intent.type = "application/pdf"
         intent.type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         startActivityForResult(intent, 1215)
     }
@@ -75,7 +85,12 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+//                findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                val myIntent = Intent(this, SettingsActivity::class.java)
+                startActivity(myIntent)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -93,26 +108,52 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             1215 -> if (resultCode == RESULT_OK) {
                 val uri = data?.data
+                val fileName = uri?.lastPathSegment
                 val inputStream = contentResolver.openInputStream(uri!!)
-//                val myFile = data?.data?.let {
-//                    getFileFromUri(contentResolver, uri!!, cacheDir)
-//                }
-//                val uriString = uri?.getPath() ?: return
-////                Toast.makeText(this, myFile?.name, Toast.LENGTH_SHORT).show()
-////                Toast.makeText(this, uriString, Toast.LENGTH_SHORT).show()
-////                Toast.makeText(this, uri.path.toString(), Toast.LENGTH_SHORT).show()
-//                val inputFileName = getFileName(this, uri)
-//                Toast.makeText(this, inputFileName, Toast.LENGTH_SHORT).show()
-//
                 if (inputStream == null) {
                     Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
                 } else {
-                    val pdf = convertDocxToPdf2(inputStream)
-                    openFile2(pdf)
+                    val viewModelJob = Job()
+                    val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
+                    coroutineScope.launch {
+                        try {
+//                            getFileName(uri)
+                            val pdf = convertDocxToPdf2(inputStream, getFileName(uri)?:"error")
+                            savePdfInDataDir(pdf)
+                            refreshRCV()
+                            // TODO LOTTIE ANIMATION START
+                            // TODO LOTTIE ANIMATION END
+                            binding.comingSoonAnimation.visibility = View.VISIBLE
+                            binding.comingSoonAnimation.visibility = View.INVISIBLE
+                            openFile2(pdf)
+                        } catch (e: Exception) {
+                            Log.e("tatti", e.stackTraceToString())
+                        }
+                    }
                 }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun refreshRCV() {
+        val folder = File(this.dataDir, "convertedPDFs")
+        binding.rcvPDFs.adapter = folder.listFiles()
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext) }
+        binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun savePdfInDataDir(pdf: File) {
+        val folder = File(this.dataDir, "convertedPDFs")
+        try {
+            val inputStream = FileInputStream(pdf)
+            val outputStream = FileOutputStream(File(folder, pdf.name))
+            inputStream.copyTo(outputStream)
+            inputStream.close()
+            outputStream.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun openFile2(file: File) {
@@ -128,9 +169,12 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    fun convertDocxToPdf2(inputStream: InputStream): File {
+    fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
         val doc = XWPFDocument(inputStream)
-        val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "output.pdf")
+        Toast.makeText(this, fileName, Toast.LENGTH_SHORT).show()
+        val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            fileName
+        )
         val fileOutputStream = FileOutputStream(output)
         val document = Document()
         PdfWriter.getInstance(document, fileOutputStream)
@@ -166,6 +210,27 @@ class MainActivity : AppCompatActivity() {
         document.close()
         Toast.makeText(this, "gfds", Toast.LENGTH_SHORT).show()
         return output
+    }
+    fun getFileName(uri: Uri): String? {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            } finally {
+                cursor?.close()
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result!!.lastIndexOf('/')
+            if (cut != -1) {
+                result = result.substring(cut + 1)
+            }
+        }
+        return result
     }
     private fun convertDocxToPdf(context: Context, docxUri: Uri) {
         val inputStream = context.contentResolver.openInputStream(docxUri)
@@ -204,6 +269,19 @@ class MainActivity : AppCompatActivity() {
             val pdfUri = Uri.fromFile(pdfFile)
         } catch (e: IOException) {
             e.printStackTrace()
+        }
+    }
+    fun composeEmail(subject: String) {
+        val a = arrayOf("usarcompanion@gmail.com")
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:") // only email apps should handle this
+            putExtra(Intent.EXTRA_EMAIL, a)
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+        }
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "No Mail App Found", Toast.LENGTH_SHORT).show()
         }
     }
 }
