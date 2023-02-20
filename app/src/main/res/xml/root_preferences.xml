@@ -1,34 +1,79 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
 
-    <PreferenceCategory app:title="@string/messages_header">
-
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory app:title="General"
+        app:iconSpaceReserved="false"
+        >
+        <Preference
+            app:key="contact"
+            app:title="Contact Us"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+    <PreferenceCategory app:title="About"
+        app:iconSpaceReserved="false"
+        >
+        <Preference
+            app:key="about"
+            app:title="A Docx to PDF converter app is an application that enables users to convert Microsoft Word documents (in the Docx format) to
+the PDF format. Such an app can be useful for individuals and organizations that need to share their documents in a more secure and
+widely-used format like PDF, as PDF files can be opened on any device and maintain their formatting across platforms. The app
+typically allows users to select a Docx file from their device's storage and convert it to a PDF file with a single click. Some Docx to
+PDF converter apps may also provide additional features, such as the ability to batch convert multiple files, customize the output file's
+layout and settings, and share or save the converted files."
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+    <PreferenceCategory app:title="Developer"
+        app:iconSpaceReserved="false">
+        <Preference
+            app:key="bug"
+            app:title="Bug Report"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"/>
+        <Preference
+            app:key="resources"
+            app:title="Resources Used"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://sites.google.com/view/usarcompanion/resources-used"
+                />
+        </Preference>
+        <Preference
+            app:key="libraries"
+            app:title="Open Source Libraries"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"
+            />
 
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+        <Preference
+            app:key="terms"
+            app:title="Terms And Conditions"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://sites.google.com/view/usarcompanion/terms-conditions"
+                />
+        </Preference>
+
+        <Preference
+            app:key="privacy"
+            app:title="Privacy Policy"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://sites.google.com/view/usarcompanion/home"
+                />
+        </Preference>
+
 
     </PreferenceCategory>
 
