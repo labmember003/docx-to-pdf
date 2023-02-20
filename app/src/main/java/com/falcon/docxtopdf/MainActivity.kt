@@ -47,17 +47,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.comingSoonAnimation.visibility = View.INVISIBLE
         setSupportActionBar(binding.toolbar)
+        binding.nothingToDisplay.visibility = View.INVISIBLE
+        binding.nothingToDisplayLottie.visibility = View.INVISIBLE
+        val folder2 = File(this.dataDir, "convertedPDFs")
+        if (folder2.listFiles().isEmpty()) {
+            binding.nothingToDisplay.visibility = View.VISIBLE
+            binding.nothingToDisplayLottie.visibility = View.VISIBLE
+        }
 
 //        val navController = findNavController(R.id.nav_host_fragment_content_main)
 //        appBarConfiguration = AppBarConfiguration(navController.graph)
 //        setupActionBarWithNavController(navController, appBarConfiguration)
-        binding.buttonFirst.setOnClickListener {
+
+//        binding.buttonFirst.setOnClickListener {
+//            binding.comingSoonAnimation.visibility = View.VISIBLE
+//            selectPDF()
+//        }
+        binding.addButton.setOnClickListener {
             binding.comingSoonAnimation.visibility = View.VISIBLE
             selectPDF()
-        }
-        binding.fab.setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAnchorView(R.id.fab).setAction("Action", null).show()
-            composeEmail("Regarding App " + getString(R.string.app_name))
         }
         val folder = File(this.dataDir, "convertedPDFs")
 //        ConvertedPdfRcvAdapter
@@ -131,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
                 } else {
                     val viewModelJob = Job()
-                    val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main )
+                    val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
                     coroutineScope.launch {
                         try {
 //                            getFileName(uri)
@@ -155,6 +163,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshRCV() {
         val folder = File(this.dataDir, "convertedPDFs")
+        if (folder.listFiles().isEmpty()) {
+            binding.nothingToDisplay.visibility = View.VISIBLE
+            binding.nothingToDisplayLottie.visibility = View.VISIBLE
+
+        } else {
+            binding.nothingToDisplay.visibility = View.INVISIBLE
+            binding.nothingToDisplayLottie.visibility = View.INVISIBLE
+        }
         binding.rcvPDFs.adapter = folder.listFiles()
             ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2, ::deleteFile) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)

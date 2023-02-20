@@ -51,11 +51,8 @@ class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, val context:
     }
     class ExistingFontViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val convertedPDF: TextView = itemView.findViewById(R.id.convertedPDF)
-//        val fontSelectedCB: CheckBox = itemView.findViewById(R.id.fontCheckBox)
         val shareButton: ImageView = itemView.findViewById(R.id.shareButton)
         val deleteButton: ImageView = itemView.findViewById(R.id.deleteButton)
         val previewImage: ImageView = itemView.findViewById(R.id.previewImage)
-
     }
-
 }

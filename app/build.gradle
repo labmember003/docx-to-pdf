@@ -58,23 +58,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-
-
-    // Apache POI
-//    implementation 'org.apache.poi:poi:5.2.3'
-//    implementation 'org.apache.poi:poi-ooxml:5.2.3'
-//    implementation 'org.apache.poi:poi-ooxml-full:5.1.0'
-//    implementation 'org.apache.poi:poi-ooxml-schemas:5.1.0'
-
-    // Apache PDFBox
-//    implementation 'org.apache.pdfbox:pdfbox:2.0.24'
-//    implementation 'org.apache.pdfbox:fontbox:2.0.24'
-
-//    implementation 'com.itextpdf:itextpdf:5.5.13.2'
-
     implementation 'org.apache.poi:poi:5.1.0'
     implementation 'com.itextpdf:itextpdf:5.5.13.2'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
-
     implementation "com.airbnb.android:lottie:5.2.0"
 }
