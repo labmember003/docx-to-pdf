@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
 
-class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, val context: Context, private val onContentClick : (File) -> Unit, private val shareFile : (File) -> Unit): RecyclerView.Adapter<ConvertedPdfRcvAdapter.ExistingFontViewHolder>() {
+class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, val context: Context, private val onContentClick : (File) -> Unit,
+                             private val shareFile : (File) -> Unit, private val deleteFile : (File) -> Unit)
+    : RecyclerView.Adapter<ConvertedPdfRcvAdapter.ExistingFontViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExistingFontViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.existing_font, parent, false)
@@ -25,6 +27,9 @@ class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, val context:
         holder.shareButton.setOnClickListener {
             shareFile(convertedPDFs[position])
         }
+        holder.deleteButton.setOnClickListener {
+            deleteFile(convertedPDFs[position])
+        }
         // TODO
 //        holder.imgview.setOnClickListener {
 //            onContentClick(convertedPDFs[position])
@@ -38,6 +43,7 @@ class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, val context:
         val convertedPDF: TextView = itemView.findViewById(R.id.convertedPDF)
 //        val fontSelectedCB: CheckBox = itemView.findViewById(R.id.fontCheckBox)
         val shareButton: ImageView = itemView.findViewById(R.id.shareButton)
+        val deleteButton: ImageView = itemView.findViewById(R.id.deleteButton)
     }
 
 }

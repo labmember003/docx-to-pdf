@@ -65,8 +65,21 @@ class MainActivity : AppCompatActivity() {
 //        val file = File(folder, "test.pdf")
 //        file.createNewFile()
         binding.rcvPDFs.adapter = folder.listFiles()
-            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2) }
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2, ::deleteFile) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
+    }
+    fun deleteFile(file: File) {
+        if (file.exists()) {
+            val deleted = file.delete()
+            if (deleted) {
+                Log.d("TAG", "deleted from the cache directory")
+            } else {
+                Log.d("TAG", "could not be deleted from the cache directory")
+            }
+        } else {
+            Log.d("TAG", "does not exist in the cache directory")
+        }
+        refreshRCV()
     }
     private fun onContentClick(file: File) {
         openFile2(file)
@@ -143,7 +156,7 @@ class MainActivity : AppCompatActivity() {
     private fun refreshRCV() {
         val folder = File(this.dataDir, "convertedPDFs")
         binding.rcvPDFs.adapter = folder.listFiles()
-            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2) }
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2, ::deleteFile) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
     }
 
