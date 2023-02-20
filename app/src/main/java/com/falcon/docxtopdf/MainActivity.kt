@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
@@ -64,10 +65,10 @@ class MainActivity : AppCompatActivity() {
 //        val file = File(folder, "test.pdf")
 //        file.createNewFile()
         binding.rcvPDFs.adapter = folder.listFiles()
-            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick) }
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
     }
-    fun onContentClick(file: File) {
+    private fun onContentClick(file: File) {
         openFile2(file)
     }
     fun selectPDF() {
@@ -142,7 +143,7 @@ class MainActivity : AppCompatActivity() {
     private fun refreshRCV() {
         val folder = File(this.dataDir, "convertedPDFs")
         binding.rcvPDFs.adapter = folder.listFiles()
-            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick) }
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
     }
 
@@ -170,6 +171,35 @@ class MainActivity : AppCompatActivity() {
         startActivity(j)
     }
 
+    private fun shareFile(file: File) {
+//        val pdfFile = File(yourPdfFilePath)
+        val contentUri = FileProvider.getUriForFile(this, "com.falcon.docxtopdf.fileprovider", file)
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "application/pdf"
+        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(Intent.createChooser(shareIntent, "Share PDF"))
+    }
+    private fun shareFile2(file: File) {
+//        val pdfFile = File(yourPdfFilePath)
+        val aName = intent.getStringExtra("iName")
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.putExtra(Intent.EXTRA_STREAM,  uriFromFile(this,file))
+        shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        shareIntent.type = "application/pdf"
+        startActivity(Intent.createChooser(shareIntent, "share.."))
+    }
+
+    fun uriFromFile(context:Context, file:File):Uri {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        {
+            return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
+        }
+        else
+        {
+            return Uri.fromFile(file)
+        }
+    }
 
 
     fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
