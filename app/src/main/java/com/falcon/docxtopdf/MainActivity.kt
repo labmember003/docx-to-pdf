@@ -64,8 +64,11 @@ class MainActivity : AppCompatActivity() {
 //        val file = File(folder, "test.pdf")
 //        file.createNewFile()
         binding.rcvPDFs.adapter = folder.listFiles()
-            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext) }
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
+    }
+    fun onContentClick(file: File) {
+        openFile2(file)
     }
     fun selectPDF() {
         val intent = Intent()
@@ -139,7 +142,7 @@ class MainActivity : AppCompatActivity() {
     private fun refreshRCV() {
         val folder = File(this.dataDir, "convertedPDFs")
         binding.rcvPDFs.adapter = folder.listFiles()
-            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext) }
+            ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
     }
 
