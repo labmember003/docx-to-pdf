@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
@@ -39,6 +40,7 @@ class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, val context:
         val pdfFile = convertedPDFs[position]
         val pdfRenderer = PdfRenderer(ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY))
         val page = pdfRenderer.openPage(0)
+        Toast.makeText(context, page.height.toString(), Toast.LENGTH_SHORT).show()
         val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
         page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
         holder.previewImage.setImageBitmap(bitmap)

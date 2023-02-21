@@ -123,6 +123,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        binding.comingSoonAnimation.visibility = View.INVISIBLE
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -145,13 +146,18 @@ class MainActivity : AppCompatActivity() {
         val folder = File(this.dataDir, "convertedPDFs")
         try {
             val inputStream = FileInputStream(pdf)
-            val outputStream = FileOutputStream(File(folder, pdf.name))
+            val pdfName = getNameWithoutExtension(pdf.name) + ".pdf"
+            val outputStream = FileOutputStream(File(folder, pdfName))
             inputStream.copyTo(outputStream)
             inputStream.close()
             outputStream.close()
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun getNameWithoutExtension(string: String): String {
+         return string.substring(0, string.indexOf("."));
     }
 
     private fun openFile2(file: File) {
@@ -184,7 +190,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
         val doc = XWPFDocument(inputStream)
-        Toast.makeText(this, fileName, Toast.LENGTH_SHORT).show()
         val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             fileName
         )
