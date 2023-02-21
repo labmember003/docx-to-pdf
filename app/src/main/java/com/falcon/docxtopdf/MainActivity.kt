@@ -1,7 +1,6 @@
 package com.falcon.docxtopdf
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
@@ -54,24 +53,12 @@ class MainActivity : AppCompatActivity() {
             binding.nothingToDisplay.visibility = View.VISIBLE
             binding.nothingToDisplayLottie.visibility = View.VISIBLE
         }
-
-//        val navController = findNavController(R.id.nav_host_fragment_content_main)
-//        appBarConfiguration = AppBarConfiguration(navController.graph)
-//        setupActionBarWithNavController(navController, appBarConfiguration)
-
-//        binding.buttonFirst.setOnClickListener {
-//            binding.comingSoonAnimation.visibility = View.VISIBLE
-//            selectPDF()
-//        }
         binding.addButton.setOnClickListener {
             binding.comingSoonAnimation.visibility = View.VISIBLE
             selectPDF()
         }
         val folder = File(this.dataDir, "convertedPDFs")
-//        ConvertedPdfRcvAdapter
         folder.mkdirs()
-//        val file = File(folder, "test.pdf")
-//        file.createNewFile()
         binding.rcvPDFs.adapter = folder.listFiles()
             ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2, ::deleteFile) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
@@ -142,15 +129,11 @@ class MainActivity : AppCompatActivity() {
                     val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
                     coroutineScope.launch {
                         try {
-//                            getFileName(uri)
                             val pdf = convertDocxToPdf2(inputStream, getFileName(uri)?:"error")
                             savePdfInDataDir(pdf)
                             refreshRCV()
-                            // TODO LOTTIE ANIMATION START
-                            // TODO LOTTIE ANIMATION END
                             binding.comingSoonAnimation.visibility = View.VISIBLE
                             binding.comingSoonAnimation.visibility = View.INVISIBLE
-                            openFile2(pdf)
                         } catch (e: Exception) {
                             Log.e("tatti", e.stackTraceToString())
                         }
@@ -200,18 +183,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(j)
     }
 
-    private fun shareFile(file: File) {
-//        val pdfFile = File(yourPdfFilePath)
-        val contentUri = FileProvider.getUriForFile(this, "com.falcon.docxtopdf.fileprovider", file)
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        shareIntent.type = "application/pdf"
-        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(Intent.createChooser(shareIntent, "Share PDF"))
-    }
     private fun shareFile2(file: File) {
-//        val pdfFile = File(yourPdfFilePath)
-        val aName = intent.getStringExtra("iName")
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.putExtra(Intent.EXTRA_STREAM,  uriFromFile(this,file))
         shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -219,19 +191,16 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(shareIntent, "share.."))
     }
 
-    fun uriFromFile(context:Context, file:File):Uri {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-        {
-            return FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
-        }
-        else
-        {
-            return Uri.fromFile(file)
+    private fun uriFromFile(context:Context, file:File):Uri {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
+        } else {
+            Uri.fromFile(file)
         }
     }
 
 
-    fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
+    private fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
         val doc = XWPFDocument(inputStream)
         Toast.makeText(this, fileName, Toast.LENGTH_SHORT).show()
         val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
@@ -273,7 +242,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "gfds", Toast.LENGTH_SHORT).show()
         return output
     }
-    fun getFileName(uri: Uri): String? {
+    private fun getFileName(uri: Uri): String? {
         var result: String? = null
         if (uri.scheme == "content") {
             val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
@@ -331,19 +300,6 @@ class MainActivity : AppCompatActivity() {
             val pdfUri = Uri.fromFile(pdfFile)
         } catch (e: IOException) {
             e.printStackTrace()
-        }
-    }
-    fun composeEmail(subject: String) {
-        val a = arrayOf("usarcompanion@gmail.com")
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:") // only email apps should handle this
-            putExtra(Intent.EXTRA_EMAIL, a)
-            putExtra(Intent.EXTRA_SUBJECT, subject)
-        }
-        try {
-            startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "No Mail App Found", Toast.LENGTH_SHORT).show()
         }
     }
 }
