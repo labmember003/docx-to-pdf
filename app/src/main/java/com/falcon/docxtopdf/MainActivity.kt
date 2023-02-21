@@ -17,9 +17,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.falcon.docxtopdf.databinding.ActivityMainBinding
 import com.itextpdf.text.Document
@@ -35,7 +32,6 @@ import java.io.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         binding.nothingToDisplay.visibility = View.INVISIBLE
         binding.nothingToDisplayLottie.visibility = View.INVISIBLE
         val folder2 = File(this.dataDir, "convertedPDFs")
-        if (folder2.listFiles().isEmpty()) {
+        if (folder2.listFiles()?.isEmpty() == true) {
             binding.nothingToDisplay.visibility = View.VISIBLE
             binding.nothingToDisplayLottie.visibility = View.VISIBLE
         }
@@ -63,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2, ::deleteFile) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
     }
-    fun deleteFile(file: File) {
+    private fun deleteFile(file: File) {
         if (file.exists()) {
             val deleted = file.delete()
             if (deleted) {
@@ -79,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     private fun onContentClick(file: File) {
         openFile2(file)
     }
-    fun selectPDF() {
+    private fun selectPDF() {
         val intent = Intent()
         intent.action = Intent.ACTION_GET_CONTENT
         intent.type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -87,18 +83,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> {
-//                findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
                 val myIntent = Intent(this, SettingsActivity::class.java)
                 startActivity(myIntent)
                 true
@@ -107,20 +98,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
-    }
-
     @SuppressLint("Range")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val viewModelJob = Job()
-        val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
         when (requestCode) {
             1215 -> if (resultCode == RESULT_OK) {
                 val uri = data?.data
-                val fileName = uri?.lastPathSegment
                 val inputStream = contentResolver.openInputStream(uri!!)
                 if (inputStream == null) {
                     Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
@@ -129,13 +111,13 @@ class MainActivity : AppCompatActivity() {
                     val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
                     coroutineScope.launch {
                         try {
-                            val pdf = convertDocxToPdf2(inputStream, getFileName(uri)?:"error")
+                            val pdf = convertDocxToPdf2(inputStream, getFileName(uri))
                             savePdfInDataDir(pdf)
                             refreshRCV()
                             binding.comingSoonAnimation.visibility = View.VISIBLE
                             binding.comingSoonAnimation.visibility = View.INVISIBLE
                         } catch (e: Exception) {
-                            Log.e("tatti", e.stackTraceToString())
+                            Log.e("error", e.stackTraceToString())
                         }
                     }
                 }
@@ -146,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun refreshRCV() {
         val folder = File(this.dataDir, "convertedPDFs")
-        if (folder.listFiles().isEmpty()) {
+        if (folder.listFiles()?.isEmpty() == true) {
             binding.nothingToDisplay.visibility = View.VISIBLE
             binding.nothingToDisplayLottie.visibility = View.VISIBLE
 
@@ -239,10 +221,9 @@ class MainActivity : AppCompatActivity() {
             document.add(Paragraph(paragraph.text, font))
         }
         document.close()
-        Toast.makeText(this, "gfds", Toast.LENGTH_SHORT).show()
         return output
     }
-    private fun getFileName(uri: Uri): String? {
+    private fun getFileName(uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {
             val cursor: Cursor? = contentResolver.query(uri, null, null, null, null)
@@ -303,5 +284,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-//.docx     application/vnd.openxmlformats-officedocument.wordprocessingml.document
-//.dotx     application/vnd.openxmlformats-officedocument.wordprocessingml.template
