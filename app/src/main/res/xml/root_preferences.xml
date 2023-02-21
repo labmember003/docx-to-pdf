@@ -42,7 +42,7 @@ layout and settings, and share or save the converted files."
             app:iconSpaceReserved="false">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://sites.google.com/view/usarcompanion/resources-used"
+                android:data="https://sites.google.com/view/docx2pdf/resources-used"
                 />
         </Preference>
         <Preference
@@ -59,7 +59,7 @@ layout and settings, and share or save the converted files."
             app:iconSpaceReserved="false">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://sites.google.com/view/usarcompanion/terms-conditions"
+                android:data="https://sites.google.com/view/docx2pdf/terms-conditions"
                 />
         </Preference>
 
@@ -70,7 +70,7 @@ layout and settings, and share or save the converted files."
             app:iconSpaceReserved="false">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://sites.google.com/view/usarcompanion/home"
+                android:data="https://sites.google.com/view/docx2pdf/home"
                 />
         </Preference>
 
