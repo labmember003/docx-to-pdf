@@ -19,7 +19,9 @@ import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.falcon.docxtopdf.databinding.ActivityMainBinding
-//import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
 import com.itextpdf.text.Font
@@ -32,13 +34,15 @@ import java.io.*
 
 
 class MainActivity : AppCompatActivity() {
+//    lateinit var mAdView : AdView
 
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-//        MobileAds.initialize(this) {}
+
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.comingSoonAnimation.visibility = View.INVISIBLE
@@ -59,6 +63,13 @@ class MainActivity : AppCompatActivity() {
         binding.rcvPDFs.adapter = folder.listFiles()
             ?.let { ConvertedPdfRcvAdapter(it.toList(), this.applicationContext, ::onContentClick, ::shareFile2, ::deleteFile) }
         binding.rcvPDFs.layoutManager = LinearLayoutManager(this)
+
+
+        // ads
+        MobileAds.initialize(this) {}
+        val mAdView = binding.adView
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
     }
     private fun deleteFile(file: File) {
         if (file.exists()) {
