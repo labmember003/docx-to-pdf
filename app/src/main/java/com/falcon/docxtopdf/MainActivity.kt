@@ -18,7 +18,6 @@ import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.falcon.docxtopdf.databinding.ActivityMainBinding
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
@@ -255,7 +254,6 @@ class MainActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(this, "File Corrupted Error", Toast.LENGTH_SHORT).show()
             }
-
         }
         val cacheDir = this.cacheDir
         val output = File(cacheDir, fileName)
@@ -263,33 +261,8 @@ class MainActivity : AppCompatActivity() {
         val document = Document()
         PdfWriter.getInstance(document, fileOutputStream)
         document.open()
-
-        val fontDirectory = File(this.cacheDir, "fonts")
-        if (!fontDirectory.exists()) {
-            fontDirectory.mkdirs()
-        }
-        val fontFile = File(fontDirectory, "abc.ttf")
-        if (fontFile.exists()) {
-            fontFile.delete()
-        }
-
-        val fos = FileOutputStream(fontFile)
-        val `in` = assets.open("abc.ttf")
-
-        val buffer = ByteArray(1024)
-
-        var read: Int
-        while (`in`.read(buffer).also { read = it } != -1) {
-            fos.write(buffer, 0, read)
-        }
-        `in`.close()
-        fos.flush()
-        fos.close()
-
-        val base = BaseFont.createFont(fontFile.absolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
-        val font = Font(base, 11f, Font.BOLD)
         for (paragraph in doc.paragraphs) {
-            document.add(Paragraph(paragraph.text, font))
+            document.add(Paragraph(paragraph.text))
         }
         document.close()
         return output
@@ -314,45 +287,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return result
-    }
-    private fun convertDocxToPdf(context: Context, docxUri: Uri) {
-        val inputStream = context.contentResolver.openInputStream(docxUri)
-        val document = Document()
-
-        try {
-            // Create a new PDF file in the app's cache directory
-            val pdfFile = File(context.cacheDir, "output.pdf")
-            val pdfOutputStream = FileOutputStream(pdfFile)
-
-            // Create a PDF writer to write the document to the output stream
-            PdfWriter.getInstance(document, pdfOutputStream)
-
-            // Open the document
-            document.open()
-
-            // Read the contents of the Docx file
-            val docxBytes = inputStream?.readBytes()
-
-            // Create a new paragraph for each line in the Docx file
-            val docxText = String(docxBytes!!)
-            val docxLines = docxText.split("\n")
-            for (line in docxLines) {
-                val paragraph = Paragraph(line)
-                paragraph.alignment = Element.ALIGN_LEFT
-                document.add(paragraph)
-            }
-
-            // Close the document and output stream
-            document.close()
-            pdfOutputStream.close()
-            inputStream.close()
-
-            // Open the converted PDF file
-            // Note: You may need to add additional code to handle the opening of the PDF file
-            val pdfUri = Uri.fromFile(pdfFile)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
     }
 }
 
