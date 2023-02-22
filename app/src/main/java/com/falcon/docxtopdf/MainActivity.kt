@@ -120,10 +120,10 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
                 } else {
                     val viewModelJob = Job()
-                    val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
+                    val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.IO)
                     coroutineScope.launch {
                         try {
-                            val pdf = convertDocxToPdf2(inputStream, getFileName(uri))
+                            val pdf = convertDocxToPdf3(inputStream, getFileName(uri))
                             savePdfInDataDir(pdf)
                             refreshRCV()
                             binding.comingSoonAnimation.visibility = View.VISIBLE
@@ -246,6 +246,54 @@ class MainActivity : AppCompatActivity() {
         document.close()
         return output
     }
+    private fun convertDocxToPdf3(inputStream: InputStream, fileName: String): File {
+        var doc = XWPFDocument()
+        try {
+            doc = XWPFDocument(inputStream)
+        } catch (e: Exception) {
+            Log.e("error", e.stackTraceToString())
+            Toast.makeText(this, "File Corrupted Error", Toast.LENGTH_SHORT).show()
+        }
+//        val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+//            fileName
+//        )
+        val cacheDir = this.cacheDir
+        val output = File(cacheDir, fileName)
+        val fileOutputStream = FileOutputStream(output)
+        val document = Document()
+        PdfWriter.getInstance(document, fileOutputStream)
+        document.open()
+
+        val fontDirectory = File(this.cacheDir, "fonts")
+        if (!fontDirectory.exists()) {
+            fontDirectory.mkdirs()
+        }
+        val fontFile = File(fontDirectory, "abc.ttf")
+        if (fontFile.exists()) {
+            fontFile.delete()
+        }
+
+        val fos = FileOutputStream(fontFile)
+        val `in` = assets.open("abc.ttf")
+
+        val buffer = ByteArray(1024)
+
+        var read: Int
+        while (`in`.read(buffer).also { read = it } != -1) {
+            fos.write(buffer, 0, read)
+        }
+        `in`.close()
+        fos.flush()
+        fos.close()
+
+        val base = BaseFont.createFont(fontFile.absolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
+        val font = Font(base, 11f, Font.BOLD)
+        for (paragraph in doc.paragraphs) {
+            document.add(Paragraph(paragraph.text, font))
+        }
+        document.close()
+        return output
+    }
     private fun getFileName(uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {
@@ -307,3 +355,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+

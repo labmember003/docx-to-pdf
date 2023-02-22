@@ -2,14 +2,12 @@ package com.falcon.docxtopdf
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 class SettingsActivity : AppCompatActivity() {
@@ -24,9 +22,6 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-
-
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
@@ -48,7 +43,6 @@ class SettingsActivity : AppCompatActivity() {
                 true
             }
         }
-
 
         private fun composeEmail(subject: String) {
             val a = arrayOf("usarcompanion@gmail.com")

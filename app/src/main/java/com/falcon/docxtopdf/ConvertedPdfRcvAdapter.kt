@@ -1,15 +1,11 @@
 package com.falcon.docxtopdf
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.pdf.PdfRenderer
-import android.os.ParcelFileDescriptor
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
@@ -37,15 +33,6 @@ class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, private val 
         holder.deleteButton.setOnClickListener {
             deleteFile(convertedPDFs[position])
         }
-//        val pdfFile = convertedPDFs[position]
-//        val pdfRenderer = PdfRenderer(ParcelFileDescriptor.open(pdfFile, ParcelFileDescriptor.MODE_READ_ONLY))
-//        val page = pdfRenderer.openPage(0)
-//        Toast.makeText(context, page.height.toString(), Toast.LENGTH_SHORT).show()
-//        val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
-//        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-//        holder.previewImage.setImageBitmap(bitmap)
-//        page.close()
-//        pdfRenderer.close()
     }
 
     override fun getItemCount(): Int {
