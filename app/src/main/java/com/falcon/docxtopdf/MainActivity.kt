@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.falcon.docxtopdf.databinding.ActivityMainBinding
+//import com.google.android.gms.ads.MobileAds
 import com.itextpdf.text.Document
 import com.itextpdf.text.Element
 import com.itextpdf.text.Font
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-
+//        MobileAds.initialize(this) {}
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.comingSoonAnimation.visibility = View.INVISIBLE
@@ -157,7 +158,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getNameWithoutExtension(string: String): String {
-         return string.substring(0, string.indexOf("."));
+         return string.substring(0, string.indexOf("."))
     }
 
     private fun openFile2(file: File) {
@@ -189,7 +190,13 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
-        val doc = XWPFDocument(inputStream)
+        var doc = XWPFDocument()
+        try {
+            doc = XWPFDocument(inputStream)
+        } catch (e: Exception) {
+            Log.e("error", e.stackTraceToString())
+            Toast.makeText(this, "File Corrupted Error", Toast.LENGTH_SHORT).show()
+        }
         val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             fileName
         )

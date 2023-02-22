@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
 
-class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, val context: Context, private val onContentClick : (File) -> Unit,
+class ConvertedPdfRcvAdapter(private val convertedPDFs: List<File>, private val context: Context, private val onContentClick : (File) -> Unit,
                              private val shareFile : (File) -> Unit, private val deleteFile : (File) -> Unit)
     : RecyclerView.Adapter<ConvertedPdfRcvAdapter.ExistingFontViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExistingFontViewHolder {
