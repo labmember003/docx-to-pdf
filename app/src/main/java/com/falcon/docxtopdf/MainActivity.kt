@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
+import android.os.*
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.Menu
@@ -125,9 +123,11 @@ class MainActivity : AppCompatActivity() {
                         try {
                             val pdf = convertDocxToPdf3(inputStream, getFileName(uri))
                             savePdfInDataDir(pdf)
-                            refreshRCV()
-                            binding.comingSoonAnimation.visibility = View.VISIBLE
-                            binding.comingSoonAnimation.visibility = View.INVISIBLE
+                            withContext(Dispatchers.Main) {
+                                refreshRCV()
+                                binding.comingSoonAnimation.visibility = View.VISIBLE
+                                binding.comingSoonAnimation.visibility = View.INVISIBLE
+                            }
                         } catch (e: Exception) {
                             Log.e("error", e.stackTraceToString())
                         }
@@ -252,11 +252,11 @@ class MainActivity : AppCompatActivity() {
             doc = XWPFDocument(inputStream)
         } catch (e: Exception) {
             Log.e("error", e.stackTraceToString())
-            Toast.makeText(this, "File Corrupted Error", Toast.LENGTH_SHORT).show()
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(this, "File Corrupted Error", Toast.LENGTH_SHORT).show()
+            }
+
         }
-//        val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-//            fileName
-//        )
         val cacheDir = this.cacheDir
         val output = File(cacheDir, fileName)
         val fileOutputStream = FileOutputStream(output)
