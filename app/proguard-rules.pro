@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class com.graphbuilder.** { *; }
+-keep class com.itextpdf.** { *; }
+-keep class com.squareup.javawriter.** { *; }
+-keep class com.zaxxer.sparsebits.** { *; }
+-keep class org.apache.** { *; }
+-keep class org.hamcrest.** { *; }
