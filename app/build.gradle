@@ -72,4 +72,5 @@ dependencies {
 
     implementation 'org.apache.poi:poi-ooxml:5.2.0'
     implementation 'com.itextpdf:itext7-core:7.1.16'
+    implementation files('libs/Docx2Pdf-Gui-Swing-1.0-SNAPSHOT.jar')
 }

@@ -19,20 +19,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.falcon.docxtopdf.databinding.ActivityMainBinding
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
-import com.itextpdf.io.image.ImageData
 import com.itextpdf.text.Document
+import com.itextpdf.text.Font
 import com.itextpdf.text.Paragraph
+import com.itextpdf.text.pdf.BaseFont
 import com.itextpdf.text.pdf.PdfWriter
 import kotlinx.coroutines.*
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import java.io.*
 
-import org.apache.poi.xwpf.usermodel.XWPFPictureData
-import com.itextpdf.text.Image
-import com.itextpdf.text.pdf.PdfDocument
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
+import com.mycompany.docx2pdf.gui.swing.Main
 
 class MainActivity : AppCompatActivity() {
 //    lateinit var mAdView : AdView
@@ -42,7 +38,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-
+        val docIn = "/home/user/docs/sample.docx"
+        val docOut = "/home/user/docs/out.pdf"
+        val fontsPath = "/home/user/docs/fonts/"
+//        Main().
+//        val app = Converter(docIn, docOut, fontsPath)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val viewModelJob = Job()
                     val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.IO)
-                    coroutineScope.launch {
+                    coroutineScope.launch  {
                         try {
                             val pdf = convertDocxToPdf3(inputStream, getFileName(uri))
                             savePdfInDataDir(pdf)
@@ -227,52 +227,52 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-//    private fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
-//        var doc = XWPFDocument()
-//        try {
-//            doc = XWPFDocument(inputStream)
-//        } catch (e: Exception) {
-//            Log.e("error", e.stackTraceToString())
-//            Toast.makeText(this, "File Corrupted Error", Toast.LENGTH_SHORT).show()
-//        }
-//        val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-//            fileName
-//        )
-//        val fileOutputStream = FileOutputStream(output)
-//        val document = Document()
-//        PdfWriter.getInstance(document, fileOutputStream)
-//        document.open()
-//
-//        val fontDirectory = File(this.cacheDir, "fonts")
-//        if (!fontDirectory.exists()) {
-//            fontDirectory.mkdirs()
-//        }
-//        val fontFile = File(fontDirectory, "abc.ttf")
-//        if (fontFile.exists()) {
-//            fontFile.delete()
-//        }
-//
-//        val fos = FileOutputStream(fontFile)
-//        val `in` = assets.open("abc.ttf")
-//
-//        val buffer = ByteArray(1024)
-//
-//        var read: Int
-//        while (`in`.read(buffer).also { read = it } != -1) {
-//            fos.write(buffer, 0, read)
-//        }
-//        `in`.close()
-//        fos.flush()
-//        fos.close()
-//
-//        val base = BaseFont.createFont(fontFile.absolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
-//        val font = Font(base, 11f, Font.BOLD)
-//        for (paragraph in doc.paragraphs) {
-//            document.add(Paragraph(paragraph.text, font))
-//        }
-//        document.close()
-//        return output
-//    }
+    private fun convertDocxToPdf2(inputStream: InputStream, fileName: String): File {
+        var doc = XWPFDocument()
+        try {
+            doc = XWPFDocument(inputStream)
+        } catch (e: Exception) {
+            Log.e("error", e.stackTraceToString())
+            Toast.makeText(this, "File Corrupted Error", Toast.LENGTH_SHORT).show()
+        }
+        val output = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            fileName
+        )
+        val fileOutputStream = FileOutputStream(output)
+        val document = Document()
+        PdfWriter.getInstance(document, fileOutputStream)
+        document.open()
+
+        val fontDirectory = File(this.cacheDir, "fonts")
+        if (!fontDirectory.exists()) {
+            fontDirectory.mkdirs()
+        }
+        val fontFile = File(fontDirectory, "abc.ttf")
+        if (fontFile.exists()) {
+            fontFile.delete()
+        }
+
+        val fos = FileOutputStream(fontFile)
+        val `in` = assets.open("abc.ttf")
+
+        val buffer = ByteArray(1024)
+
+        var read: Int
+        while (`in`.read(buffer).also { read = it } != -1) {
+            fos.write(buffer, 0, read)
+        }
+        `in`.close()
+        fos.flush()
+        fos.close()
+
+        val base = BaseFont.createFont(fontFile.absolutePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED)
+        val font = Font(base, 11f, Font.BOLD)
+        for (paragraph in doc.paragraphs) {
+            document.add(Paragraph(paragraph.text, font))
+        }
+        document.close()
+        return output
+    }
     private fun convertDocxToPdf3(inputStream: InputStream, fileName: String): File {
         var doc = XWPFDocument()
         try {
