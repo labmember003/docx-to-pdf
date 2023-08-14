@@ -51,6 +51,10 @@ class MainActivity : AppCompatActivity() {
         binding.nothingToDisplay.visibility = View.INVISIBLE
         binding.nothingToDisplayLottie.visibility = View.INVISIBLE
         val folder2 = File(this.dataDir, "convertedPDFs")
+        if (!folder2.exists()) {
+            binding.nothingToDisplay.visibility = View.VISIBLE
+            binding.nothingToDisplayLottie.visibility = View.VISIBLE
+        }
         if (folder2.listFiles()?.isEmpty() == true) {
             binding.nothingToDisplay.visibility = View.VISIBLE
             binding.nothingToDisplayLottie.visibility = View.VISIBLE
